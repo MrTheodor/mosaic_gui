@@ -1,0 +1,32 @@
+/*
+ * style.css
+ * Copyright (C) 2015 Jakub Krajniak
+ *
+ * Distributed under terms of the GNU GPLv3 license.
+ */
+
+body {
+    background: white;
+    color: black;
+}
+
+div.block {
+    width: 30px;
+    height: 30px;
+    border: 1px solid black;
+    display: inline-block;
+    margin-right: 2px;
+    vertical-align: middle;
+}
+
+table#nodes {
+    empty-cells: show;
+}
+
+table#nodes tr {
+    height: 30px;
+}
+table#nodes td {
+    height: 30px;
+    width: 30px;
+}

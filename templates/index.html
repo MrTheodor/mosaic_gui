@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Mosaic</title>
+    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='socket.io.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function(){
+
+            // create grid of cells.
+            var tab = $("table#nodes");
+            for (var r = 0; r < 8; r++) {
+                var row = $("<tr>")
+                for (var c = 0; c < 8; c++) {
+                    row.append("<td id='node_" + (r*8+c) + "'/>");
+                }
+                tab.append(row);
+            }
+
+            var socket = io.connect();
+
+            socket.on('connect', function() {
+                socket.emit('connect', {data: 'Hi!'});
+            });
+
+        });
+    </script>
+</head>
+<body>
+    <img src="{{ url_for('video_feed') }}" />
+    <a href="/processing" >click</a>
+</body>
+</html>
+
