@@ -5,11 +5,6 @@
  * Distributed under terms of the GNU GPLv3 license.
  */
 
-body {
-    background: white;
-    color: black;
-}
-
 div.block {
     width: 30px;
     height: 30px;
@@ -21,12 +16,26 @@ div.block {
 
 table#nodes {
     empty-cells: show;
+    border: 1px solid black;
+    margin-bottom: 20px;
 }
 
 table#nodes tr {
-    height: 30px;
+    height: 40px;
+    border: 1px solid black;
 }
 table#nodes td {
-    height: 30px;
-    width: 30px;
+    height: 40px;
+    width: 40px;
+    border: 1px solid black;
 }
+
+div#webcam, div.webcam {
+    min-height: 480px;
+    min-width: 640px;
+}
+
+div.steps {
+    min-height: 1280px;
+}
+

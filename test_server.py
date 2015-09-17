@@ -6,14 +6,14 @@
 #
 
 from flask import Flask, render_template, Response, request
-#from camera import Camera
+from flask import stream_with_context
 import cv2
 import Image
 import StringIO
 from flask.ext.socketio import SocketIO, emit
 import base64
 from gevent.wsgi import WSGIServer
-
+import requests
 
 class Camera(object):
     def __init__(self):
@@ -29,7 +29,7 @@ class Camera(object):
 
 
 app = Flask(__name__)
-app.debug = False
+app.debug = True
 socketio = SocketIO(app)
 
 
@@ -47,8 +47,12 @@ def index():
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(gen(Camera()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    n = request.args.get('n', 0)
+    url = 'http://localhost:8080/?action=snapshot&n={}'.format(n)
+    req = requests.get(url)
+    return Response(stream_with_context(req.iter_content()), content_type = req.headers['content-type'])
+    #return Response(gen(Camera()),
+    #                mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/processing')
 def processing():
@@ -71,5 +75,5 @@ def update_log():
 
 if __name__ == '__main__':
     from socketio.server import SocketIOServer
-    SocketIOServer(('0.0.0.0', 8080), app,
+    SocketIOServer(('0.0.0.0', 5050), app,
                    resource="socket.io", policy_server=False).serve_forever()
