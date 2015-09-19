@@ -13,6 +13,7 @@ class PLogger(object):
         self.rank = source_rank
         self.status = 0
         self.update_url = '{}/update_log/?'.format(host_url)
+        self.host_url = host_url
 
     def write(self, message, status=None):
         if status is not None:
@@ -24,3 +25,11 @@ class PLogger(object):
         except IOError:
             pass
         print('{}: {}'.format(self.rank, message))
+
+    def emit_finished(self, filename):
+        params = {'filename': filename}
+        url = '{}/finished/?'.format(self.host_url) + urllib.urlencode(params)
+        try:
+            urllib.urlopen(url)
+        except IOError:
+            pass

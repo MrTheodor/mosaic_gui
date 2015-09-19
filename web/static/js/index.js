@@ -2,7 +2,7 @@
  * index.js
  * Copyright (C) 2015 Jakub Krajniak <jkrajniak@gmail.com>
  *
- * Distributed under terms of the GNU GPLv2 license.
+ * Distributed under terms of the GNU GPLv3 license.
  *
  * createImageLayer, imageOnload and imageOnclick by Richard Atterer
  *
@@ -14,7 +14,7 @@
 var imageNr = 0; // Serial number of current image
 var finished = new Array(); // References to img objects which have finished downloading
 var paused = false;
-var url = "http://localhost:8080/?action=snapshot&n="
+var host = "http://localhost:8080/"
 
 function createImageLayer() {
   var img = new Image();
@@ -22,7 +22,7 @@ function createImageLayer() {
   img.style.zIndex = -1;
   img.onload = imageOnload;
   img.onclick = imageOnclick;
-  img.src = url + (++imageNr);
+  img.src = host + "?action=snapshot&n=" + (++imageNr);
   var webcam = document.getElementById("webcam");
   webcam.insertBefore(img, webcam.firstChild);
 }
@@ -42,5 +42,3 @@ function imageOnclick() { // Clicking on the image will pause the stream
   paused = !paused;
   if (!paused) createImageLayer();
 }
-
-

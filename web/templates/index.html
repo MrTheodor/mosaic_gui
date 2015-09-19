@@ -17,7 +17,6 @@
     <link href="{{ url_for('static', filename='css/jumbotron-narrow.css') }}" rel="stylesheet">
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function(){
-
             // create grid of cells.
             var tab = $("table#nodes");
             for (var r = 0; r < 8; r++) {
@@ -38,7 +37,7 @@
             $("#capture").click(function() {
                 $.scrollTo("#step2", 800);
                 paused = true;
-                $("img#capture-preview").attr("src", url + imageNr);
+                $("img#capture-preview").attr("src", host + "?action=take&filename=snapshot.jpg");
             })
 
             $("#back_capture").click(function() {
@@ -47,26 +46,82 @@
                 createImageLayer();
             })
 
-            $("#create_mosaic").click(function() {
-                $.scrollTo("#step3", 800);
+            /* Create mosaic, notify daemon.*/
+            $("#email").blur(function() {
+                if($(this).val()) {
+                    $(this).parent('div').removeClass('has-error').addClass('has-success');
+                } else {
+                    $(this).parent('div').removeClass('has-success').addClass('has-error');
+                }
             });
 
+            $("#search").blur(function() {
+                if($(this).val()) {
+                    $(this).parent('div').removeClass('has-error').addClass('has-success');
+                } else {
+                    $(this).parent('div').removeClass('has-success').addClass('has-error');
+                }
+            });
+
+            $("#create_mosaic").click(function() {
+                // Validate input.
+                is_valid = true;
+                if (!$("#email").val()) {
+                   is_valid = false;
+                   $("#email").parent('div').addClass('has-error');
+                }
+
+                if (!$("#search").val()) {
+                    is_valid = false;
+                    $("#search").parent('div').addClass('has-error');
+                }
+
+                if (is_valid) {
+                    $.scrollTo("#step3", 800);
+                    socket.emit(
+                        'create_mosaic',
+                        {'search': $('#search').val(), 'email': $('#email').val()});
+                }
+            });
+
+            /** Updating node grid and log page. */
             var node_status = ["white", "#337ab7", "#419641", "#eb9316"];
             socket.on('update log', function(data) {
                 console.log(data);
-                $("#console").append($('<li class="list-group-item">').text(
-                  data.source + ": " + data.message));
-                $("#node_" + data.source).css('background-color', node_status[data.status]);
+                if (data['message']) {
+                  $("#console").prepend($('<li class="list-group-item">').text(
+                      data.source + ": " + data.message));
+                }
+                if (data['status'])
+                  $("#node_" + data.source).css('background-color', node_status[data.status]);
+            });
+
+            /** Finished message. */
+            socket.on('finished', function(data) {
+                console.log(data);
+                filename = data['filename']
+                $("img#result").attr("src", "/get_file/"+filename);
+                $("#recipient").text($("#email").val());
+                $.scrollTo("#step4", 800);
+            });
+
+            /** Start again. */
+            $("#start_again").click(function() {
+                paused = false;
+                $.scrollTo("#step1", 800);
+                $("#search").val("");
+                $("#email").val("");
+                createImageLayer();
             });
         });
     </script>
 </head>
 <body role="document">
     <div class="container theme-showcase" role="main">
-        <div class="header clearfix">
+        <div class="header clearfix" id="step1">
             <h3 class="text-muted">Mosaic on Pi</h3>
         </div>
-        <div id="step1" class="steps">
+        <div class="steps">
             <div id="webcam"><noscript><img src="/video_feed" /></noscript></div>
             <p style="margin-top: 10px;">
             <button type="button" class="btn btn-lg btn-primary" id="capture">
@@ -84,10 +139,10 @@
             <p style="margin-top: 10px;">
             <div class="input-group input-group-lg">
                 <span class="input-group-addon" id="sizing-addon1">#</span>
-                <input type="text" class="form-control" placeholder="search string" aria-describedby="basic-addon1">
+                <input type="text" id="search" class="form-control" placeholder="search string" aria-describedby="basic-addon1">
             </div>
             <div class="input-group input-group-lg" style="margin-top: 5px;">
-                <input type="text" class="form-control" placeholder="e-mail" aria-describedby="basic-addon1">
+                <input type="text" id="email" class="form-control" placeholder="e-mail" aria-describedby="basic-addon1">
                 <span class="input-group-addon" id="sizing-addon1">@example.com</span>
             </div>
             <div style="margin-top: 10px;">
@@ -115,8 +170,21 @@
                 <button type="button" class="btn btn-warning">matching</button>
             </div>
             <h3>Logs</h3>
-            <ul id="console" class="list-group"> 
+            <ul id="console" class="list-group" style="max-height: 200px; overflow-y: scroll">
             </ul>
+        </div>
+        <div id="step4" class="steps">
+            <h2>Result</h2>
+            <div class="webcam">
+                <img id="result" style="padding: 20px; border: 1px solid #419641;" />
+            </div>
+            <h3>Image sent to: <span id="recipient"/></h3>
+            <p style="margin-top: 10px;" >
+            <button type="button" class="btn btn-lg btn-success" id="start_again">
+                <span class="glyphicon glyphicon-arrow-left" aria-hidden="true" />
+                Again
+            </button>
+            </p>
         </div>
     </div>
 </body>
