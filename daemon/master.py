@@ -31,7 +31,7 @@ logger = plogger.PLogger(rank)
 def process(data):
     print 'Hi I am master, rank ', rank
     print 'I will notify other nodes to start processing'
-    comm.bcast(None, root=0)
+    comm.Barrier()
     logger.write('btw, I\'ve got some data {} cool!'.format(data))
     logger.write('search tag {}'.format(data['search']))
     logger.write('result send {}'.format(data['email']))
@@ -47,7 +47,6 @@ def process(data):
     output_file = 'output_{}.jpg'.format(time.time())
     print('Copy {} -> {}'.format(SNAPSHOT, os.path.join(basedir, output_file)))
     shutil.copyfile(SNAPSHOT, os.path.join(basedir, output_file))
-    print('Send email to {}'.format(data['email']))
     msg = MIMEMultipart(
         From=SEND_FROM,
         To=data['email'],
@@ -61,7 +60,8 @@ def process(data):
                 Content_Disposition='attachment; filename="{}"'.format(output_file),
                 Name=output_file
             ))
-    smtp = smtplib.SMTP(SMTP_SERVER)
+    print('Send email to {}'.format(data['email']))
+    smtp = smtplib.SMTP(SMTP_SERVER, timeout=15)
     smtp.sendmail(SEND_FROM, data['email'], msg.as_string())
     smtp.close()
     logger.emit_finished(output_file)

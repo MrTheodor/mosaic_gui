@@ -48,6 +48,5 @@ if rank == 0:
 else:
     # Infinite loop. Waiting for signal from rank=0 to start node.process().
     while True:
-        signal = None
-        comm.bcast(signal, root=0)
+        comm.Barrier()
         node.process()

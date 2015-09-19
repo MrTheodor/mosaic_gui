@@ -18,7 +18,8 @@ logger = plogger.PLogger(rank)
 
 
 def process():
-    logger.write('Hi I am doing something', status=3)
-    time.sleep(5)
-    logger.write('Ok I am done', status=2)
+    logger.write('Hi I am doing something', status=plogger.IDLE)
+    for s in plogger.valid_status:
+        time.sleep(s+1)
+        logger.write('Ok{}.format(s)', status=s)
     comm.Barrier()
