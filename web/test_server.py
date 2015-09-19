@@ -5,7 +5,9 @@
 # Distributed under terms of the GNU GPLv3 license.
 #
 
+import argparse
 import cPickle
+import os
 import socket
 
 from flask import Flask, render_template, Response, request, send_file
@@ -14,21 +16,17 @@ from flask.ext.socketio import SocketIO
 app = Flask(__name__)
 app.debug = True
 socketio = SocketIO(app)
-port = 5050
-
-try:
-    daemon_host = open('../daemon/hostname').read().strip()
-    print('Daemon host: {}'.format(daemon_host))
-except:
-    daemon_host = None
-
-DAEMON_FILES = '../daemon/files'
 
 
 @app.route('/')
 def index():
     """Renders the index page."""
-    return render_template('index.html')
+
+    # Gets last
+    jpg_files = [f for f in os.listdir(daemon_files) if f.startswith('output_')]
+    jpg_files.sort(key=lambda x: float(x.replace('.jpg', '').split('_')[1]), reverse=True)
+
+    return render_template('index.html', jpg_files=jpg_files[:4])
 
 
 @socketio.on('connect')
@@ -70,7 +68,7 @@ def update_log():
 @app.route('/get_file/<filename>')
 def get_snapshot(filename):
     """Returns snapshot.jpg."""
-    return send_file('{}/{}'.format(DAEMON_FILES, filename), mimetype='image/jpeg')
+    return send_file('{}/{}'.format(daemon_files, filename), mimetype='image/jpeg')
 
 
 @app.route('/finished/')
@@ -81,6 +79,19 @@ def finished():
 
 
 if __name__ == '__main__':
+    args = argparse.ArgumentParser()
+    args.add_argument('--host', default='0.0.0.0')
+    args.add_argument('--port', default=5050, type=int)
+    args.add_argument('--daemon_host', required=True)
+    args.add_argument('--daemon_files', required=True)
+
+    argv = args.parse_args()
+
+    daemon_host = open(argv.daemon_host).read().strip()
+    print('Daemon host: {}'.format(daemon_host))
+
+    daemon_files = argv.daemon_files
+
     from socketio.server import SocketIOServer
-    SocketIOServer(('0.0.0.0', port), app,
+    SocketIOServer((argv.host, argv.port), app,
                    resource="socket.io", policy_server=False).serve_forever()

@@ -101,6 +101,11 @@
                 console.log(data);
                 filename = data['filename']
                 $("img#result").attr("src", "/get_file/"+filename);
+                $("div#last_pictures img:last-child").remove();
+                $("div#last_pictures").prepend(
+                        $("<img>").attr("src", "/get_file/"+filename)
+                                  .attr("height", "105px")
+                                  .attr("width", "140px"));
                 $("#recipient").text($("#email").val());
                 $.scrollTo("#step4", 800);
             });
@@ -129,6 +134,16 @@
                 Capture
             </button>
             </p>
+
+            <div style="margin-top: 20px;">
+                <h4>Last pictures</h4>
+                <div id="last_pictures">
+                {% for j in jpg_files %}
+                <img src="/get_file/{{ j }}" height="105px" width="140px" />
+                {% endfor %}
+                </div>
+            </div>
+
         </div>
 
         <div id="step2" class="steps">

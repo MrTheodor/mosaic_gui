@@ -60,9 +60,15 @@ def process(data):
                 Content_Disposition='attachment; filename="{}"'.format(output_file),
                 Name=output_file
             ))
-    print('Send email to {}'.format(data['email']))
-    smtp = smtplib.SMTP(SMTP_SERVER, timeout=15)
-    smtp.sendmail(SEND_FROM, data['email'], msg.as_string())
-    smtp.close()
-    logger.emit_finished(output_file)
+    logger.write('Sending email to {}'.format(data['email']))
+    try:
+        smtp = smtplib.SMTP(SMTP_SERVER, timeout=15)
+        smtp.sendmail(SEND_FROM, data['email'], msg.as_string())
+        smtp.close()
+        logger.write('E-mail sent!')
+    except Exception as ex:
+        logger.write('Problem with sending email')
+        print(ex)
+    finally:
+        logger.emit_finished(output_file)
     logger.write('finished', status=plogger.FINISHED)
