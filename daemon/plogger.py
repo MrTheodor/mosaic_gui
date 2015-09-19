@@ -7,17 +7,28 @@
 
 import urllib
 
+IDLE = 0
+DOWNLOAD = 1
+FINISHED = 2
+MATCHING = 3
+
+valid_status = [IDLE, DOWNLOAD, FINISHED, MATCHING]
+
 
 class PLogger(object):
     def __init__(self, source_rank, initial_status=0, host_url='http://0.0.0.0:5050'):
         self.rank = source_rank
         self.status = 0
+        if self.status not in valid_status:
+            raise Exception('Invalid status')
         self.update_url = '{}/update_log/?'.format(host_url)
         self.host_url = host_url
 
     def write(self, message, status=None):
         if status is not None:
             self.status = status
+        if self.status not in valid_status:
+            raise Exception('Invalid status {}'.format(status))
         params = {'source': self.rank, 'message': message, 'status': self.status}
         update_url = self.update_url + urllib.urlencode(params)
         try:
