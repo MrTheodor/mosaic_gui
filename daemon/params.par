@@ -1,0 +1,3 @@
+SNAPSHOT = '/home/teodor/project/mosaic_web/daemon/files/snapshot.jpg'
+SMTP_SERVER = 'mail4.cs.kuleuven.be'
+SEND_FROM = 'jakub.krajniak@cs.kuleuven.be'
