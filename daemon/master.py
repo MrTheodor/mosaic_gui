@@ -25,7 +25,7 @@ SMTP_SERVER = None
 SEND_FROM = None
 execfile('params.par')
 
-logger = plogger.PLogger(rank)
+logger = plogger.PLogger(rank, host_url=LOGGER_HOST)
 
 
 def process(data):
@@ -36,7 +36,7 @@ def process(data):
     logger.write('search tag {}'.format(data['search']))
     logger.write('result send {}'.format(data['email']))
     if os.path.exists(SNAPSHOT):
-        logger.write('found {}'.format(SNAPSHOT))
+        logger.write('found {}'.format(SNAPSHOT), status=plogger.DOWNLOAD)
 
     # Wait for other nodes to finish
     comm.Barrier()
@@ -47,12 +47,12 @@ def process(data):
     output_file = 'output_{}.jpg'.format(time.time())
     print('Copy {} -> {}'.format(SNAPSHOT, os.path.join(basedir, output_file)))
     shutil.copyfile(SNAPSHOT, os.path.join(basedir, output_file))
-    msg = MIMEMultipart(
-        From=SEND_FROM,
-        To=data['email'],
-        Date=formatdate(localtime=True),
-        Subject='opendag superpi mosaic'
-        )
+    msg = MIMEMultipart()
+    msg['Subject'] = 'CS KU Leuven Opendag SuperPi Mosaic'
+    msg['From'] = SEND_FROM
+    msg['To'] = data['email']
+    msg.preamble = 'Mosaic photo\n\nBeste, Mosaic Team'
+
     with open(os.path.join(basedir, output_file), 'rb') as output_mosaic:
         msg.attach(
             MIMEApplication(

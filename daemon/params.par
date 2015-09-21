@@ -1,3 +1,4 @@
-SNAPSHOT = '/home/teodor/project/mosaic_web/daemon/files/snapshot.jpg'
-SMTP_SERVER = 'mail4.cs.kuleuven.be'
-SEND_FROM = 'jakub.krajniak@cs.kuleuven.be'
+SNAPSHOT="/home/jakub/mosaic/mosaic_gui/daemon/files/snapshot.jpg"
+SMTP_SERVER="mail4.cs.kuleuven.be"
+SEND_FROM="jakub.krajniak@cs.kuleuven.be"
+LOGGER_HOST="http://superpi.cs.kuleuven.be:5050/"

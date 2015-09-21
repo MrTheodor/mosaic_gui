@@ -13,4 +13,7 @@ OUTPUT_FILES="daemon/files"
 
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$PATH_TO_MJPG"
 
-$PATH_TO_MJPG/mjpg_streamer -i "input_uvc.so" -o "output_http.so" -o "output_file.so -f $OUTPUT_FILES --http"
+# Webcam
+#$PATH_TO_MJPG/mjpg_streamer -i "input_uvc.so" -o "output_http.so" -o "output_file.so -f $OUTPUT_FILES --http"
+# Rasbian
+$PATH_TO_MJPG/mjpg_streamer -i "input_raspicam.so -hf -vf" -o "output_http.so" -o "output_file.so -f $OUTPUT_FILES --http"

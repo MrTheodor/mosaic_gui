@@ -1,0 +1,9 @@
+#!/bin/bash
+#PBS -l nodes=4:ppn=4
+#PBS -lwalltime=168:00:00:00
+
+cd $PBS_O_WORKDIR
+
+n_proc="`cat $PBS_NODEFILE | wc -l`"
+
+mpiexec -np $n_proc -machinefile $PBS_NODEFILE python mosaic_daemon.py &> log

@@ -14,12 +14,14 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-logger = plogger.PLogger(rank)
+execfile('params.par')
+
+logger = plogger.PLogger(rank, host_url=LOGGER_HOST)
 
 
 def process():
-    logger.write('Hi I am doing something', status=plogger.IDLE)
+    logger.write('Hi I am ready', status=plogger.IDLE)
     for s in plogger.valid_status:
         time.sleep(s+1)
-        logger.write('Ok{}.format(s)', status=s)
+        logger.write('Ok - {}'.format(s), status=s)
     comm.Barrier()
