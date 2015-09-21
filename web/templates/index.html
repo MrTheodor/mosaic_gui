@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     <link href="{{ url_for('static', filename='css/jumbotron-narrow.css') }}" rel="stylesheet">
     <script type="text/javascript" charset="utf-8">
+        host = "http://{{ snapshot_hostname }}/";
         $(document).ready(function(){
             // create grid of cells.
             var tab = $("table#nodes");
             for (var r = 0; r < 8; r++) {
                 var row = $("<tr>")
                 for (var c = 0; c < 8; c++) {
-                    row.append("<td id='node_" + (r*8+c) + "'/>");
+                    row.append("<td class='node_cells' id='node_" + (r*8+c) + "'/>");
                 }
                 tab.append(row);
             }
@@ -37,7 +38,7 @@
             $("#capture").click(function() {
                 $.scrollTo("#step2", 800);
                 paused = true;
-                $("img#capture-preview").attr("src", host + "?action=take&filename=snapshot.jpg");
+                $("img#capture-preview").attr("src", host + "?action=take&filename=doesnotmatter.jpg");
             })
 
             $("#back_capture").click(function() {
@@ -107,6 +108,7 @@
                                   .attr("height", "105px")
                                   .attr("width", "140px"));
                 $("#recipient").text($("#email").val());
+                $(".node_cells").css('background-color', 'white');
                 $.scrollTo("#step4", 800);
             });
 
@@ -115,6 +117,7 @@
                 paused = false;
                 $.scrollTo("#step1", 800);
                 $("#search").val("");
+                $(".node_cells").css('background-color', 'white');
                 $("#email").val("");
                 createImageLayer();
             });

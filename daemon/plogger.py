@@ -12,7 +12,7 @@ DOWNLOAD = 1
 FINISHED = 2
 MATCHING = 3
 
-valid_status = [IDLE, DOWNLOAD, FINISHED, MATCHING]
+valid_status = [IDLE, DOWNLOAD, MATCHING, FINISHED]
 
 
 class PLogger(object):
@@ -23,6 +23,7 @@ class PLogger(object):
             raise Exception('Invalid status')
         self.update_url = '{}/update_log/?'.format(host_url)
         self.host_url = host_url
+        print('PLogger rank:{}, host_url:{}'.format(source_rank, host_url))
 
     def write(self, message, status=None):
         if status is not None:

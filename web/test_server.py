@@ -17,6 +17,8 @@ app = Flask(__name__)
 app.debug = True
 socketio = SocketIO(app)
 
+snapshot_hostname = None
+
 
 @app.route('/')
 def index():
@@ -26,7 +28,7 @@ def index():
     jpg_files = [f for f in os.listdir(daemon_files) if f.startswith('output_')]
     jpg_files.sort(key=lambda x: float(x.replace('.jpg', '').split('_')[1]), reverse=True)
 
-    return render_template('index.html', jpg_files=jpg_files[:4])
+    return render_template('index.html', jpg_files=jpg_files[:4], snapshot_hostname=snapshot_hostname)
 
 
 @socketio.on('connect')
@@ -82,10 +84,14 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser()
     args.add_argument('--host', default='0.0.0.0')
     args.add_argument('--port', default=5050, type=int)
-    args.add_argument('--daemon_host', required=True)
-    args.add_argument('--daemon_files', required=True)
+    args.add_argument('--daemon_host', required=True, help='Path to daemon/hostname file')
+    args.add_argument('--daemon_files', required=True, help='Path where daemon stores jpegs')
+    args.add_argument('--snapshot_hostname', help='Snapshot hostname',
+                      default='superpi.cs.kuleuven.be:8080')
 
     argv = args.parse_args()
+
+    snapshot_hostname = argv.snapshot_hostname
 
     daemon_host = open(argv.daemon_host).read().strip()
     print('Daemon host: {}'.format(daemon_host))
