@@ -11,12 +11,19 @@ nohup ./start_stream.sh &
 
 echo "Starting daemon..."
 cd daemon
+rm -f hostname
+
 qsub run_job.pbs
+
+until [ -f hostname ]
+do
+     sleep 1
+done
 
 echo "Starting web..."
 cd ..
 cd web
-nohup python test_server.py --daemon_host ../daemon/hostname --daemon_files ../daemon/files &
+python test_server.py --daemon_host /home/pi/mosaic_gui/daemon/hostname --daemon_files /home/pi/mosaic_gui/daemon/output &
 cd ..
 
 echo "Let's play..."

@@ -8,11 +8,15 @@
 import urllib
 
 IDLE = 0
-DOWNLOAD = 1
-FINISHED = 2
+INIT = 1
+DOWNLOAD = 2
 MATCHING = 3
+SENDING = 4
+RECEIVING = 5
+COMPOSING = 6
+FINISHED = 7
 
-valid_status = [IDLE, DOWNLOAD, MATCHING, FINISHED]
+valid_status = [IDLE, INIT, DOWNLOAD, SENDING, RECEIVING, MATCHING, COMPOSING, FINISHED]
 
 
 class PLogger(object):
@@ -37,6 +41,14 @@ class PLogger(object):
         except IOError:
             pass
         print('{}: {}'.format(self.rank, message))
+
+    def emit_partial(self, filename):
+        params = {'filename': filename}
+        url = '{}/partial/?'.format(self.host_url) + urllib.urlencode(params)
+        try:
+            urllib.urlopen(url)
+        except IOError:
+            pass
 
     def emit_finished(self, filename):
         params = {'filename': filename}
