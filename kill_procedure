@@ -1,0 +1,3 @@
+killall python
+killall mjpg_streamer
+qdel 'all'

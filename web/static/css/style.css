@@ -25,14 +25,16 @@ table#nodes tr {
     border: 1px solid black;
 }
 table#nodes td {
-    height: 40px;
-    width: 40px;
+    min-height: 40px;
+    min-width: 40px;
     border: 1px solid black;
 }
 
 div#webcam, div.webcam {
     min-height: 480px;
+    max-height: 480px;
     min-width: 640px;
+    max-width: 640px;
 }
 
 div.steps {
