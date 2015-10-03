@@ -18,4 +18,5 @@ export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$PATH_TO_MJPG"
 # Webcam
 #$PATH_TO_MJPG/mjpg_streamer -i "input_uvc.so" -o "output_http.so" -o "output_file.so -f $OUTPUT_FILES --http"
 # Rasbian
-$PATH_TO_MJPG/mjpg_streamer -i "input_raspicam.so -hf -vf -quality 100 " -o "output_http.so" -o "output_file.so -f $OUTPUT_FILES --http"
+#$PATH_TO_MJPG/mjpg_streamer -i "input_raspicam.so -hf -vf -quality 100 " -o "output_http.so" -o "output_file.so -f $OUTPUT_FILES --http"
+$PATH_TO_MJPG/mjpg_streamer -i "input_raspicam.so -hf -vf -quality 100 -x 1280 -y 720 -rot 90" -o "output_http.so" -o "output_file.so -f $OUTPUT_FILES --http"

@@ -24,10 +24,10 @@ def index():
     """Renders the index page."""
 
     # Gets last
-    jpg_files = [f for f in os.listdir(daemon_files) if f.startswith('output_')]
-    jpg_files.sort(key=lambda x: float(x.replace('.jpg', '').split('_')[1]), reverse=True)
+    img_files = [f for f in os.listdir(daemon_files) if f.startswith('final')]
+    img_files.sort(key=lambda x: float(x.replace('.png', '').split('_')[-1]), reverse=True)
 
-    return render_template('index.html', jpg_files=jpg_files[:4], camera_hostname=camera_hostname)
+    return render_template('index.html', jpg_files=img_files[:4], camera_hostname=camera_hostname)
 
 @socketio.on('connect')
 def on_connect():
@@ -51,6 +51,17 @@ def on_create_mosaic(data):
     else:
         print('No daemon defined')
 
+@socketio.on('ping daemon')
+def on_ping_daemon():
+    """Check if daemon is ready to process mosaic otherwise block gui."""
+    if daemon_host is not None:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        host, port = daemon_host.split(':')
+        print('Ping daemon {}'.format(daemon_host))
+        sock.sendto(cPickle.dumps('ping'), (host, int(port)))
+    else:
+        print('No daemon defined')
+
 @app.route('/update_log/', methods=['GET'])
 def update_log():
     """Updates log on web page.
@@ -60,10 +71,11 @@ def update_log():
         message: The string with message.
     """
     source = request.args['source']
+    node = request.args['node']
     status = request.args.get('status', '')
     message = request.args.get('message', '')
     print('Emmit from {} message "{}"'.format(source, message))
-    socketio.emit('update log', {'source': source, 'message': message, 'status': status})
+    socketio.emit('update log', {'source': source, 'message': message, 'status': status, 'node': node})
     return Response(message)
 
 @app.route('/get_file/<filename>')
@@ -88,6 +100,11 @@ def partial():
     filename = os.path.basename(request.args['filename'])
     print('emit partial', filename)
     socketio.emit('partial', {'filename': '{}?t={}'.format(filename, time.time())})
+    return Response('OK')
+
+@app.route('/pong/')
+def pong():
+    socketio.emit('daemon pong')
     return Response('OK')
 
 if __name__ == '__main__':

@@ -5,6 +5,10 @@
  * Distributed under terms of the GNU GPLv3 license.
  */
 
+body {
+    //overflow: hidden;
+}
+
 div.block {
     width: 30px;
     height: 30px;
@@ -16,25 +20,33 @@ div.block {
 
 table#nodes {
     empty-cells: show;
-    border: 1px solid black;
     margin-bottom: 20px;
 }
 
 table#nodes tr {
     height: 40px;
-    border: 1px solid black;
 }
 table#nodes td {
     min-height: 40px;
-    min-width: 40px;
-    border: 1px solid black;
+    min-width: 140px;
+    text-align: center;
 }
 
-div#webcam, div.webcam {
-    min-height: 480px;
+div.rank_cells { 
+    min-width: 30px;
+    min-height: 30px;
+    float: left;
+    border: 1px solid black;
+    margin-right: 2px;
+}
+
+div#webcam, div#webcam img, div.webcam, div.webcam img {
+    /*min-height: 480px;
     max-height: 480px;
     min-width: 640px;
-    max-width: 640px;
+    max-width: 640px;*/
+    width: 480px;
+    height: 640px;
 }
 
 div.steps {
