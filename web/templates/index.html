@@ -20,23 +20,36 @@
 
         $(document).ready(function()
         {
+            
+            var daemon_observer;
+
             // create grid of cells.
             var tab = $("table#nodes");
-            for (var r = 0; r < 8; r++) 
-            {
+            for (var ni = 0; ni < 4; ni++) {
                 var row = $("<tr>");
-                for (var c = 0; c < 8; c++) 
-                {
-                    row.append("<td class='node_cells' id='node_" + (r*8+c) + "'/>");
+                for (var nj=0; nj < 4; nj++) {
+                    var nodeid = ni*4+nj + 1;
+                    td = $("<td class='node_cells' id='node" + nodeid + "'></td>");
+                    for (var r=0; r < 4; r++) {
+                        rankid = (ni*4+nj)*r + r;
+                        td.append($("<div title='rank" + rankid + "' class='rank_cells' id='node" + nodeid + "_" + r + "'></div>"));
+                    }
+                    td.append("<span class='node_title'>node " + nodeid + "</span>");
+                    row.append(td);
                 }
                 tab.append(row);
             }
-
+            
+            // socketio
             var socket = io.connect();
 
             socket.on('connect', function() 
             {
                 socket.emit('connect');
+                $("#capture").prop('disabled', true);
+                daemon_observer = setInterval(function() {
+                    socket.emit('ping daemon');
+                    }, 1000);
             });
             createImageLayer();
 
@@ -131,11 +144,13 @@ FINISHED = 7
             socket.on('update log', function(data)
             {
                 console.log(data);
+                rankid = data.source % 4;
                 if (data['message']) 
-                    $("#console").prepend($('<li class="list-group-item">').text(data.source + ": " + data.message));
+                    $("#console").prepend($('<li class="list-group-item">').text(data.node + " (" + rankid + "): " + data.message));
 
-                if (data['status'])
-                    $("#node_" + data.source).css('background-color', node_status[data.status]);
+                if (data['status']) {
+                    $("#" + data.node + "_" + rankid).css('background-color', node_status[data.status]);
+                }
             });
 
             /** Finished message. */
@@ -150,7 +165,7 @@ FINISHED = 7
                                   .attr("height", "105px")
                                   .attr("width", "140px"));
                 $("#recipient").text($("#email").val());
-                $(".node_cells").css('background-color', 'white');
+                $(".rank_cells").css('background-color', 'white');
                 $.scrollTo("#step4", 800);
             });
 
@@ -160,6 +175,12 @@ FINISHED = 7
 		filename = data['filename'];
 		$("img#partial").attr("src", "/get_file/" + filename);
 	    });	
+
+            socket.on('daemon pong', function() {
+                console.log('daemon pong');	
+                $("#capture").prop('disabled', false);
+                clearInterval(daemon_observer);
+                });
 	    
             /** Start again. */
             $("#start_again").click(function() 
@@ -171,7 +192,7 @@ FINISHED = 7
                 $("#email").parent('div').removeClass('has-error has-success');
                 $("#email").val("");
 
-                $(".node_cells").css('background-color', 'white');
+                $(".rank_cells").css('background-color', 'white');
                 $("img#partial").attr('src', '');
 
                 $("img#result").attr('src', '');
@@ -179,6 +200,10 @@ FINISHED = 7
 
                 createImageLayer();
                 $.scrollTo("#step1", 800);
+                $("#capture").prop('disabled', true)
+                daemon_observer = setInterval(function() {
+                    socket.emit('ping daemon')
+                    }, 500)
             });
         });
     </script>
@@ -191,20 +216,25 @@ FINISHED = 7
         </div>
         <div class="steps">
             <h2>Stap 1: Neem foto</h2>
-            <div id="webcam"><noscript><img src="/video_feed" /></noscript></div>
+            <div>
+            
+            <div style="float: left; margin-right: 20px; ">
+            <div id="webcam"><noscript><img src="/video_feed"/></noscript></div>
             <p style="margin-top: 10px;">
             <button type="button" class="btn btn-lg btn-primary" id="capture">
                 <span class="glyphicon glyphicon-camera" aria-hidden="true" /> Vastleggen 
             </button>
             </p>
+            </div>
 
-            <div style="margin-top: 20px;">
+            <div>
                 <h4>Laatste afbeeldingen</h4>
                 <div id="last_pictures">
                 {% for j in jpg_files %}
                 <img src="/get_file/{{ j }}" height="105px" width="140px" />
                 {% endfor %}
                 </div>
+            </div>
             </div>
         </div>
 
@@ -238,7 +268,7 @@ FINISHED = 7
             <table class="table" style="margin-bottom: 10px;">
              <tr>
               <td style="padding-right: 20px;"><table id="nodes"></table></td>
-              <td><img id="partial" src="" style="padding: 20px; border: 1px solid #337ab7; width: 457px; height: 343px;"></td>
+              <td><img id="partial" src="" style="padding: 20px; border: 1px solid #337ab7; height: 457px; width: 343px;"></td>
              </tr>
             </table>
 	    <p>This product uses the Flickr API but is not endorsed or certified by Flickr.
@@ -261,7 +291,7 @@ FINISHED = 7
         <div id="step4" class="steps">
             <h2>Stap 4: Resultaat</h2>
             <div class="webcam">
-                <img id="result" style="padding: 20px; border: 1px solid #419641 width: 640px; height: 480px;" />
+                <img id="result" style="padding: 20px; border: 1px solid #419641 height: 640px; width: 480px;" />
             </div>
             <h3>Afbeelding verstuurd naar: <span id="recipient"/></h3>
             <p style="margin-top: 10px;" >

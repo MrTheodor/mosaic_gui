@@ -34,13 +34,15 @@ rank = comm.Get_rank()
 size = comm.Get_size()
 status = MPI.Status()
 
-logger = plogger.PLogger(rank)
+execfile('params.par')
+
+logger = plogger.PLogger(rank, host_url=LOGGER_HOST)
 
 NScrappers = 4
-NPlacers = 10
-NIters = 2
+NPlacers = 30
+NIters = 5
 
-int_pars = {'NScrapers': NScrappers, 'NPlacers': NPlacers, 'iters': NIters, 'per_page': 60, 'MaxTilesVert': 20, 'fidelity': 9, 'poolSize': 40, 'UsedPenalty': 0, 'useDB' : False}
+int_pars = {'NScrapers': NScrappers, 'NPlacers': NPlacers, 'iters': NIters, 'per_page': 100, 'MaxTilesVert': 30, 'fidelity': 9, 'poolSize': 40, 'UsedPenalty': 0, 'useDB' : False}
 string_pars = {'savepath' : './imgs/'}
 
 # update default parameters with given values
@@ -55,10 +57,15 @@ class UDPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         global pars
         global comm
+        global logger
         data = cPickle.loads(self.request[0])
-        print('{} wrote: {}'.format(self.client_address[0], data))
-        comm.Barrier()
-        master.process(pars, data)
+        if isinstance(data, dict):
+            print('{} wrote: {}'.format(self.client_address[0], data))
+            comm.Barrier()
+            master.process(pars, data)
+        elif isinstance(data, str):
+            if data.strip() == 'ping':
+                logger.pong()
 
 assert size == 1+pars['NScrapers']+pars['NPlacers']   
 if rank == 0:

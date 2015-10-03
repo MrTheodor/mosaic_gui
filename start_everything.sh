@@ -17,13 +17,13 @@ qsub run_job.pbs
 
 until [ -f hostname ]
 do
-     sleep 1
+     sleep 2
 done
 
 echo "Starting web..."
 cd ..
 cd web
-python test_server.py --daemon_host /home/pi/mosaic_gui/daemon/hostname --daemon_files /home/pi/mosaic_gui/daemon/output &
+nohup python test_server.py --daemon_host /home/pi/mosaic_gui/daemon/hostname --daemon_files /home/pi/mosaic_gui/daemon/output &
 cd ..
 
 echo "Let's play..."

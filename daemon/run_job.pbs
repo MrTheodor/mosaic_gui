@@ -5,6 +5,6 @@
 cd $PBS_O_WORKDIR
 
 #n_proc="`cat $PBS_NODEFILE | wc -l`"
-n_proc=15
+n_proc=35
 
 mpiexec -np $n_proc -machinefile $PBS_NODEFILE python mosaic_daemon.py &> log
