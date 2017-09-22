@@ -1,10 +1,12 @@
 #!/bin/bash
-#PBS -l nodes=8:ppn=4
+#PBS -l nodes=13:ppn=4
 #PBS -lwalltime=168:00:00:00
 
 cd $PBS_O_WORKDIR
 
 #n_proc="`cat $PBS_NODEFILE | wc -l`"
-n_proc=35
+n_proc=52
 
-mpiexec -np $n_proc -machinefile $PBS_NODEFILE python mosaic_daemon.py &> log
+cp $PBS_NODEFILE pbs_nodefile
+
+mpiexec -np $n_proc -machinefile $PBS_NODEFILE python mosaic_daemon.py params.par &> log

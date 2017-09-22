@@ -41,7 +41,7 @@
             }
             
             // socketio
-            var socket = io.connect();
+            socket = io.connect();
 
             socket.on('connect', function() 
             {
@@ -183,28 +183,8 @@ FINISHED = 7
                 });
 	    
             /** Start again. */
-            $("#start_again").click(function() 
-            {
-                paused = false;
-                $("img#capture-preview").attr('src', '');
-                $("#search").parent('div').removeClass('has-error has-success');
-                $("#search").val("");
-                $("#email").parent('div').removeClass('has-error has-success');
-                $("#email").val("");
-
-                $(".rank_cells").css('background-color', 'white');
-                $("img#partial").attr('src', '');
-
-                $("img#result").attr('src', '');
-                $("#recipient").text("");
-
-                createImageLayer();
-                $.scrollTo("#step1", 800);
-                $("#capture").prop('disabled', true)
-                daemon_observer = setInterval(function() {
-                    socket.emit('ping daemon')
-                    }, 500)
-            });
+            $("#start_again").click(restartPage);
+            $("#restart-btn").click(restartPage);
         });
     </script>
 </head>
@@ -213,6 +193,11 @@ FINISHED = 7
     <div class="container theme-showcase" role="main">
         <div class="header clearfix" id="step1">
             <h3 class="text-muted">Mozaïek generator op een Raspberry Pi supercomputer</h3>
+        </div>
+        <div style="top:0px; right:0px; position: fixed">
+            <button type="button" class="btn btn-warning" id="restart-btn">
+              <span class="glyphicon glyphicon glyphicon-remove" aria-hidden="true" />
+            </button>
         </div>
         <div class="steps">
             <h2>Stap 1: Neem foto</h2>

@@ -6,7 +6,7 @@
 # Distributed under terms of the GNU GPLv3 license.
 #
 
-echo "Staring stream server..."
+echo "Starting stream server..."
 nohup ./start_stream.sh &
 
 echo "Starting daemon..."
@@ -15,6 +15,7 @@ rm -f hostname
 
 qsub run_job.pbs
 
+echo "Waiting for master server to get started..."
 until [ -f hostname ]
 do
      sleep 2

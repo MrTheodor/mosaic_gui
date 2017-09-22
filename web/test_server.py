@@ -74,7 +74,7 @@ def update_log():
     node = request.args['node']
     status = request.args.get('status', '')
     message = request.args.get('message', '')
-    print('Emmit from {} message "{}"'.format(source, message))
+    print('Emit from {} message "{}"'.format(source, message))
     socketio.emit('update log', {'source': source, 'message': message, 'status': status, 'node': node})
     return Response(message)
 

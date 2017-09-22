@@ -1,3 +1,5 @@
 killall python
 killall mjpg_streamer
 qdel 'all'
+rm -f daemon/hostname
+rm -f daemon/output/doesnotmatter.jpg

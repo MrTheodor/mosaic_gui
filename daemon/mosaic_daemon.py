@@ -34,15 +34,18 @@ rank = comm.Get_rank()
 size = comm.Get_size()
 status = MPI.Status()
 
-execfile('params.par')
+port = 9090
+hostname_file = 'hostname'
+
+execfile(sys.argv[1])
 
 logger = plogger.PLogger(rank, host_url=LOGGER_HOST)
 
-NScrappers = 4
-NPlacers = 30
+NScrapers = 6
+NPlacers = 45
 NIters = 5
 
-int_pars = {'NScrapers': NScrappers, 'NPlacers': NPlacers, 'iters': NIters, 'per_page': 100, 'MaxTilesVert': 30, 'fidelity': 9, 'poolSize': 40, 'UsedPenalty': 0, 'useDB' : False}
+int_pars = {'NScrapers': NScrapers, 'NPlacers': NPlacers, 'iters': NIters, 'per_page': 150, 'MaxTilesVert': 50, 'fidelity': 9, 'poolSize': 40, 'UsedPenalty': 0, 'useDB' : False}
 string_pars = {'savepath' : './imgs/'}
 
 # update default parameters with given values
@@ -70,8 +73,7 @@ class UDPHandler(SocketServer.BaseRequestHandler):
 assert size == 1+pars['NScrapers']+pars['NPlacers']   
 if rank == 0:
     hostname = socket.gethostname()
-    port = 9090
-    with open('hostname', 'w') as f:
+    with open(hostname_file, 'w') as f:
         f.write('{}:{}'.format(hostname, port))
     logger.write('{} starting listening server on {}:{}'.format(rank, hostname, port))
     server = SocketServer.UDPServer((hostname, 9090), UDPHandler)
